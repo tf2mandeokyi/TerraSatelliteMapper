@@ -1,3 +1,6 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+import org.apache.tools.ant.filters.ReplaceTokens
+
 buildscript {
     repositories {
         jcenter()
@@ -52,17 +55,19 @@ configurations {
 }
 
 dependencies {
-    deobfProvided ('com.github.OpenCubicChunks.CubicChunks:cubicchunks:6e18a97abe31e1c7892ebcf8ed0f17a4ac379e10') {
+    deobfProvided ('com.github.OpenCubicChunks.CubicChunks:cubicchunks:f71aafb9854466ac5ffa0ccd2796921684f1d8b1') {
         transitive = false
     }
     deobfProvided ('com.github.OpenCubicChunks:CubicWorldGen:27de56d2f792513873584b2f8fd9f3082fb259ec') {
         transitive = false
     }
-    deobfProvided ('com.github.BuildTheEarth:terraplusplus:74449c4af349fd9b77b10e1041ed2c09f2d78518') {
+    deobfProvided ('com.github.BuildTheEarth:terraplusplus:8c9b9aaf40c8470af9d106944622ba2fc9f99ef8') {
         transitive = true
     }
 
     testCompile 'junit:junit:4.13.2'
+
+    provided 'org.projectlombok:lombok:1.18.20'
 }
 
 processResources {
@@ -73,7 +78,7 @@ processResources {
     // replace ${version} to the project version
     with copySpec {
         from 'src/main/resources/mcmod.info'
-        filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['${version}': version])
+        filter(ReplaceTokens, tokens: ['${version}': version])
     }
 
     // replace stuff in mcmod.info, nothing else
@@ -102,7 +107,7 @@ reobf {
     shadowJar {}
 }
 
-task relocateShadowJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation) {
+task relocateShadowJar(type: ConfigureShadowRelocation) {
     target = tasks.shadowJar
     prefix = "${project.mod_group}.${project.mod_id}.dep"
 }
