@@ -1,7 +1,7 @@
 [
   {
-    "modid": "btestlmapper",
-    "name": "BTESatelliteMapper",
+    "modid": "tppstlmapper",
+    "name": "TerraSatelliteMapper",
     "description": "Generates satellite imagery data into Terra++ World.",
     "version": "${version}",
     "mcversion": "1.12.2",
