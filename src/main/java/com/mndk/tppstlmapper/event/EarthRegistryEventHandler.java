@@ -14,7 +14,7 @@ public class EarthRegistryEventHandler {
 
     @SubscribeEvent
     public void datasets(InitDatasetsEvent event) {
-        event.register(KEY_DATASET_SATELLITE_IMAGERY, new SatelliteImageryDataset(new OpenStreetMapTileServer(), 18));
+        event.register(KEY_DATASET_SATELLITE_IMAGERY, new SatelliteImageryDataset(new OpenStreetMapTileServer(), 16));
     }
 
     @SubscribeEvent
