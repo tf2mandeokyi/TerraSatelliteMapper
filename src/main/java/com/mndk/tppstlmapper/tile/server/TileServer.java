@@ -1,10 +1,11 @@
 package com.mndk.tppstlmapper.tile.server;
 
 import com.mndk.tppstlmapper.tile.TileImageData;
-import com.mndk.tppstlmapper.tile.TilePosition;
 import com.mndk.tppstlmapper.tile.TilePosToUrlFunction;
+import com.mndk.tppstlmapper.tile.TilePosition;
 import com.mndk.tppstlmapper.tile.projection.TileServerProjection;
 import com.mndk.tppstlmapper.util.MemoryCache;
+import io.netty.buffer.ByteBufInputStream;
 import lombok.Getter;
 import net.buildtheearth.terraplusplus.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terraplusplus.util.bvh.Bounds2d;
@@ -12,12 +13,12 @@ import net.buildtheearth.terraplusplus.util.http.Http;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -49,6 +50,7 @@ public class TileServer {
 
 
     public CompletableFuture<TileImageData> fetch(TilePosition pos) {
+        /*
         synchronized (this.cache) {
             String url;
             try {
@@ -59,15 +61,38 @@ public class TileServer {
             }
             return cache.getAsync(pos, () -> Http.get(url).thenApply(byteBuf -> {
                 try {
-                    byte[] bytes = new byte[byteBuf.readableBytes()];
-                    byteBuf.readBytes(bytes);
-                    return ImageIO.read(new ByteArrayInputStream(bytes));
+                    ByteBufInputStream stream = new ByteBufInputStream(byteBuf);
+                    return ImageIO.read(stream);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;
                 }
             })).thenApply(image -> new TileImageData(pos, image, this));
+
         }
+         */
+        synchronized (this.cache) {
+            String url;
+            try {
+                url = this.urlFunction.get(pos).toString();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                return null;
+            }
+            return CompletableFuture.supplyAsync(() -> {
+                BufferedImage image = cache.get(pos, () -> {
+                    try {
+                        ByteBufInputStream stream = new ByteBufInputStream(Http.get(url).get());
+                        return ImageIO.read(stream);
+                    } catch (IOException | ExecutionException | InterruptedException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                });
+                return new TileImageData(pos, image, this);
+            }, this.executorService);
+        }
+
     }
 
 
