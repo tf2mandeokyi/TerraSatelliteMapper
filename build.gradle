@@ -113,3 +113,7 @@ task relocateShadowJar(type: ConfigureShadowRelocation) {
 }
 
 shadowJar.dependsOn relocateShadowJar
+
+test {
+    useJUnitPlatform()
+}
