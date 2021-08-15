@@ -33,7 +33,6 @@ public class MemoryCache<Key, Type> {
             for (int i = 0; i < cacheList.size(); ++i) {
                 Map.Entry<Key, Type> entry = cacheList.get(i);
                 if(key.equals(entry.getKey())) {
-                    System.out.println("Cache hit");
                     // Cache hit
                     cacheList.remove(i);
                     cacheList.add(0, entry);
@@ -41,7 +40,6 @@ public class MemoryCache<Key, Type> {
                 }
             }
             // Cache miss
-            System.out.println("Cache miss");
             if (fallback == null) return null;
             return this.cache(key, fallback.get());
         }
@@ -49,16 +47,16 @@ public class MemoryCache<Key, Type> {
 
     /*
     * I'm using Supplier<CompletableFuture<Type>> here instead of CompletableFuture<Type>, because
-    * if you use the normal Comp.<T> one, and call Comp.supplyAsync(), the async function will be
-    * called regardless of cache hit or miss, which isn't good.
-    * But if you use Sup.<Comp.<T>>, the issue won't happen because it's sealed from being called.
+    * if you use CompletableFuture<T>, and call CompletableFuture.supplyAsync(), the async function will be
+    * called regardless of cache hit or cache miss.
+    * That's not good, but if you use Supplier<CompletableFuture<T>> instead, the issue won't happen because
+    * the async function will be sealed from being called.
     * */
     public CompletableFuture<Type> getAsync(@Nonnull Key key, Supplier<CompletableFuture<Type>> fallback) {
         synchronized (this) {
             for (int i = 0; i < cacheList.size(); ++i) {
                 Map.Entry<Key, Type> entry = cacheList.get(i);
                 if(key.equals(entry.getKey())) {
-                    System.out.println("Cache hit");
                     // Cache hit
                     cacheList.remove(i);
                     cacheList.add(0, entry);
@@ -66,7 +64,6 @@ public class MemoryCache<Key, Type> {
                 }
             }
             // Cache miss
-            System.out.println("Cache miss");
             if (fallback == null) return null;
             return fallback.get().thenApply(value -> this.cache(key, value));
         }
@@ -77,7 +74,6 @@ public class MemoryCache<Key, Type> {
             if(value == null) return null;
             cacheList.add(0, new AbstractMap.SimpleEntry<>(key, value));
             if (cacheList.size() > cacheSize) {
-                System.out.println("Cache full");
                 cacheList.remove(cacheSize - 1);
             }
             return value;

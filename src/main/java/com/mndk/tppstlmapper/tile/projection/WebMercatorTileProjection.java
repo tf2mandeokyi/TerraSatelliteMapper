@@ -41,7 +41,7 @@ public class WebMercatorTileProjection implements TileServerProjection {
         double factor = Math.pow(2, zoom);
         double a = Math.log(Math.tan(Math.toRadians(lat)) + (1 / Math.cos(Math.toRadians(lat)))) / Math.PI;
         if(invertLatitude) a = -a;
-        return new double[]{
+        return new double[] {
                 factor * (lon + 180) / 360,
                 factor * (1 - a) / 2
         };
