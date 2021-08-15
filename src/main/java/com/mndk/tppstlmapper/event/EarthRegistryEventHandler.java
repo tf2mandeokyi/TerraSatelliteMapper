@@ -21,7 +21,6 @@ public class EarthRegistryEventHandler {
     @SuppressWarnings("rawtypes")
     public void dataBakers(InitEarthRegistryEvent<IEarthDataBaker> event) {
         event.registry().addLast("stlmapper_tileimage", new SatelliteImageryBaker());
-        // event.registry().addLast("stlmapper_test", new SampleImageBaker());
     }
 
 }
