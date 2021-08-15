@@ -44,7 +44,7 @@ public class RGBColorToBlock {
 
     public static void init(FMLInitializationEvent event) {
         registerBlockProperties(Blocks.STONE, BlockStone.VARIANT);
-        registerBlock(Blocks.GRASS, BlockGrass.SNOWY, false);
+        // registerBlock(Blocks.GRASS, BlockGrass.SNOWY, false);
         registerBlockProperties(Blocks.DIRT, BlockDirt.VARIANT);
         registerBlock(Blocks.COBBLESTONE);
         registerBlockProperties(Blocks.PLANKS, BlockPlanks.VARIANT);
