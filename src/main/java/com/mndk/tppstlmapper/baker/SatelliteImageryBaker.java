@@ -11,6 +11,9 @@ import net.buildtheearth.terraplusplus.generator.data.IEarthDataBaker;
 import net.buildtheearth.terraplusplus.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terraplusplus.util.CornerBoundingBox2d;
 import net.buildtheearth.terraplusplus.util.bvh.Bounds2d;
+import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.ChunkPos;
 
 import java.util.concurrent.CompletableFuture;
@@ -54,7 +57,12 @@ public class SatelliteImageryBaker implements IEarthDataBaker<int[]> {
         for(int x = 0; x < 16; ++x) {
             for(int z = 0; z < 16; ++z) {
                 int index = x * 16 + z;
-                builder.surfaceBlocks()[index] = RGBColorToBlock.getNearestColor(data[index]).getKey();
+                IBlockState blockState = builder.surfaceBlocks()[index];
+                Material original = blockState == null ? null : blockState.getMaterial();
+
+                if (original == null || original.getMaterialMapColor() == MapColor.GRASS) {
+                    builder.surfaceBlocks()[index] = RGBColorToBlock.getNearestColor(data[index]).getKey();
+                }
             }
         }
     }

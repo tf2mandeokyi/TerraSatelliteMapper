@@ -28,7 +28,7 @@ public class TileServer {
     private final TileServerProjection projection;
     private final TilePosToUrlFunction urlFunction;
     private final ExecutorService executorService;
-    private final MemoryCache<String, BufferedImage> cache;
+    private final MemoryCache<TileImagePos, BufferedImage> cache;
 
 
     private static final String USER_AGENT;
@@ -49,23 +49,25 @@ public class TileServer {
 
 
     public CompletableFuture<TileImageData> fetch(TileImagePos pos) {
-        String url;
-        try {
-            url = this.urlFunction.get(pos).toString();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return cache.getAsync(url, () -> Http.get(url).thenApply(byteBuf -> {
+        synchronized (this) {
+            String url;
             try {
-                byte[] bytes = new byte[byteBuf.readableBytes()];
-                byteBuf.readBytes(bytes);
-                return ImageIO.read(new ByteArrayInputStream(bytes));
-            } catch (IOException e) {
+                url = this.urlFunction.get(pos).toString();
+            } catch (MalformedURLException e) {
                 e.printStackTrace();
                 return null;
             }
-        })).thenApply(image -> new TileImageData(pos, image, this));
+            return cache.getAsync(pos, () -> Http.get(url).thenApply(byteBuf -> {
+                try {
+                    byte[] bytes = new byte[byteBuf.readableBytes()];
+                    byteBuf.readBytes(bytes);
+                    return ImageIO.read(new ByteArrayInputStream(bytes));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            })).thenApply(image -> new TileImageData(pos, image, this));
+        }
     }
 
 
