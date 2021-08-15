@@ -1,21 +1,24 @@
 package com.mndk.tppstlmapper.dataset;
 
+import com.mndk.tppstlmapper.tile.TileImageData;
+import com.mndk.tppstlmapper.tile.server.TileServer;
+import lombok.Getter;
 import lombok.NonNull;
-import net.buildtheearth.terraplusplus.dataset.TiledDataset;
-import net.buildtheearth.terraplusplus.projection.GeographicProjection;
-import net.minecraft.util.math.ChunkPos;
+import lombok.RequiredArgsConstructor;
+import net.buildtheearth.terraplusplus.dataset.IElementDataset;
+import net.buildtheearth.terraplusplus.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terraplusplus.util.CornerBoundingBox2d;
 
-import java.awt.image.BufferedImage;
 import java.util.concurrent.CompletableFuture;
 
-public class SatelliteImageryDataset extends TiledDataset<BufferedImage> {
+@RequiredArgsConstructor
+public class SatelliteImageryDataset implements IElementDataset<TileImageData> {
 
-    public SatelliteImageryDataset(@NonNull GeographicProjection projection, double tileSize) {
-        super(projection, tileSize);
-    }
+    @Getter private final TileServer tileServer;
+    @Getter private final int defaultZoom;
 
     @Override
-    public CompletableFuture<BufferedImage> load(@NonNull ChunkPos key) {
-        return null;
+    public CompletableFuture<TileImageData[]> getAsync(@NonNull CornerBoundingBox2d boundsGeo) throws OutOfProjectionBoundsException {
+        return tileServer.fetchAllAsync(boundsGeo, defaultZoom);
     }
 }
