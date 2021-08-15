@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 @Getter
 public class TileImageData {
 
-    private final TileImagePos pos;
+    private final TilePosition pos;
     private final BufferedImage image;
     private final TileServer parent;
 

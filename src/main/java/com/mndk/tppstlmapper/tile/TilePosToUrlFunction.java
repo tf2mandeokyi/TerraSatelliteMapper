@@ -5,5 +5,5 @@ import java.net.URL;
 
 @FunctionalInterface
 public interface TilePosToUrlFunction {
-    URL get(TileImagePos pos) throws MalformedURLException;
+    URL get(TilePosition pos) throws MalformedURLException;
 }
