@@ -5,6 +5,7 @@ import com.mndk.tppstlmapper.dataset.SatelliteImageryDataset;
 import com.mndk.tppstlmapper.event.EarthRegistryEventHandler;
 import com.mndk.tppstlmapper.tile.TileImageData;
 import com.mndk.tppstlmapper.util.RGBColorDouble;
+import lombok.RequiredArgsConstructor;
 import net.buildtheearth.terraplusplus.generator.CachedChunkData;
 import net.buildtheearth.terraplusplus.generator.GeneratorDatasets;
 import net.buildtheearth.terraplusplus.generator.data.IEarthDataBaker;
@@ -18,7 +19,10 @@ import net.minecraft.util.math.ChunkPos;
 
 import java.util.concurrent.CompletableFuture;
 
+@RequiredArgsConstructor
 public class SatelliteImageryBaker implements IEarthDataBaker<int[]> {
+
+    private final boolean leaveOsmElements;
 
     @Override
     public CompletableFuture<int[]> requestData(
@@ -60,7 +64,7 @@ public class SatelliteImageryBaker implements IEarthDataBaker<int[]> {
                 IBlockState blockState = builder.surfaceBlocks()[index];
                 Material original = blockState == null ? null : blockState.getMaterial();
 
-                if (original == null || original.getMaterialMapColor() == MapColor.GRASS) {
+                if (!leaveOsmElements || (original == null || original.getMaterialMapColor() == MapColor.GRASS)) {
                     builder.surfaceBlocks()[index] = RGBColorToBlock.getNearestColor(data[index]).getKey();
                 }
             }

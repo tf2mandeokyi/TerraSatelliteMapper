@@ -32,11 +32,11 @@ public class TileServer {
     private final MemoryCache<TilePosition, BufferedImage> cache;
 
 
-    public TileServer(TileServerProjection projection, TilePosToUrlFunction urlFunction, int maximumConcurrentRequests) {
+    public TileServer(TileServerProjection projection, TilePosToUrlFunction urlFunction, int maximumConcurrentRequests, int cacheSize) {
         this.projection = projection;
         this.urlFunction = urlFunction;
         this.executorService = Executors.newFixedThreadPool(maximumConcurrentRequests);
-        this.cache = new MemoryCache<>();
+        this.cache = new MemoryCache<>(cacheSize);
         try {
             Http.setMaximumConcurrentRequestsTo(
                     this.urlFunction.get(new TilePosition(0, 0, 0)).toString(), maximumConcurrentRequests);

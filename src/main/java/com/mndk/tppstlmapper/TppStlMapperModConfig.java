@@ -6,6 +6,8 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import static com.mndk.tppstlmapper.util.MemoryCache.DEFAULT_SIZE;
+
 @Config(modid = TerraSatelliteMapperMod.MODID)
 @Mod.EventBusSubscriber
 public class TppStlMapperModConfig {
@@ -24,7 +26,7 @@ public class TppStlMapperModConfig {
             "   {u}: Tile quadkey (Used for Bing maps)",
             "URL examples:",
             "   OpenStreetMap -> https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-            "   Bing maps -> https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/{u}?it=A"
+            "   Aerial Bing maps -> https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/{u}?it=A"
     })
     public static String url = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 
@@ -35,6 +37,14 @@ public class TppStlMapperModConfig {
     @Config.Name("Max Concurrent Request")
     @Config.Comment("The maximum concurrent request count.")
     public static int maxConcurrentRequest = 2;
+
+    @Config.Name("Leave OSM elements")
+    @Config.Comment("Whether to leave generated osm elements (by T++) or not.")
+    public static boolean leaveOsmElements = true;
+
+    @Config.Name("Cache size")
+    @Config.Comment("The maximum capacity of the satellite imagery memory cache.")
+    public static int cacheSize = DEFAULT_SIZE;
 
     @SubscribeEvent
     public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {

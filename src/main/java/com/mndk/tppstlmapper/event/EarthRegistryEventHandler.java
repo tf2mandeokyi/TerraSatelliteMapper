@@ -27,7 +27,7 @@ public class EarthRegistryEventHandler {
                             .replace("{y}", Integer.toString(tilePos.y))
                             .replace("{z}", Integer.toString(tilePos.zoom))
                             .replace("{u}", TileQuadKey.toQuadKey(tilePos))
-                    ), TppStlMapperModConfig.maxConcurrentRequest),
+                    ), TppStlMapperModConfig.maxConcurrentRequest, TppStlMapperModConfig.cacheSize),
                     TppStlMapperModConfig.zoom)
             );
         }
@@ -40,7 +40,7 @@ public class EarthRegistryEventHandler {
             event.registry().remove("stlmapper_tileimage");
         } catch(IllegalArgumentException ignored) {}
         if(TppStlMapperModConfig.enabled) {
-            event.registry().addLast("stlmapper_tileimage", new SatelliteImageryBaker());
+            event.registry().addLast("stlmapper_tileimage", new SatelliteImageryBaker(TppStlMapperModConfig.leaveOsmElements));
         }
     }
 
