@@ -16,7 +16,7 @@ buildscript {
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "com.github.johnrengelman.shadow"
 
-version = file('version.txt').text.trim() + "-1.12.2"
+version = file('version.txt').text.trim() + "." + ('git rev-list --count HEAD'.execute().text.trim()) + "-1.12.2"
 group = project.mod_group
 archivesBaseName = project.mod_id
 
