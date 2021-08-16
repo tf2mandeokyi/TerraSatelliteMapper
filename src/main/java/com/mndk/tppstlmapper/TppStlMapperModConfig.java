@@ -1,13 +1,17 @@
 package com.mndk.tppstlmapper;
 
 import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Config(modid = TerraSatelliteMapperMod.MODID)
+@Mod.EventBusSubscriber
 public class TppStlMapperModConfig {
 
     @Config.Name("Enabled")
-    @Config.Comment("Whether to enable the satellite imagery generation.")
-    @Config.RequiresWorldRestart
+    @Config.Comment("Whether to enable the satellite imagery generation or not.")
     public static boolean enabled = true;
 
     @Config.Name("Map Service URL")
@@ -31,4 +35,11 @@ public class TppStlMapperModConfig {
     @Config.Name("Max Concurrent Request")
     @Config.Comment("The maximum concurrent request count.")
     public static int maxConcurrentRequest = 2;
+
+    @SubscribeEvent
+    public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (TerraSatelliteMapperMod.MODID.equals(event.getModID())) {
+            ConfigManager.sync(TerraSatelliteMapperMod.MODID, Config.Type.INSTANCE);
+        }
+    }
 }

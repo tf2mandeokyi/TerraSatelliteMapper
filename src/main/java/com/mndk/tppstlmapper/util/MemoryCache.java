@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 public class MemoryCache<Key, Type> {
 
-    public static final int DEFAULT_SIZE = 10000;
+    public static final int DEFAULT_SIZE = 1000;
 
     private final Map<Key, Map.Entry<Long, Type>> cacheMap;
     private final int cacheSize;
