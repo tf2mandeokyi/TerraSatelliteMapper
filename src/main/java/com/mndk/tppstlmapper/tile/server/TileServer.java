@@ -32,9 +32,6 @@ public class TileServer {
     private final MemoryCache<TilePosition, BufferedImage> cache;
 
 
-    private static final String USER_AGENT;
-
-
     public TileServer(TileServerProjection projection, TilePosToUrlFunction urlFunction, int maximumConcurrentRequests) {
         this.projection = projection;
         this.urlFunction = urlFunction;
@@ -50,27 +47,6 @@ public class TileServer {
 
 
     public CompletableFuture<TileImageData> fetch(TilePosition pos) {
-        /*
-        synchronized (this.cache) {
-            String url;
-            try {
-                url = this.urlFunction.get(pos).toString();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return null;
-            }
-            return cache.getAsync(pos, () -> Http.get(url).thenApply(byteBuf -> {
-                try {
-                    ByteBufInputStream stream = new ByteBufInputStream(byteBuf);
-                    return ImageIO.read(stream);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            })).thenApply(image -> new TileImageData(pos, image, this));
-
-        }
-         */
         synchronized (this.cache) {
             String url;
             try {
@@ -92,7 +68,6 @@ public class TileServer {
                 return new TileImageData(pos, image, this);
             }, this.executorService);
         }
-
     }
 
 
@@ -112,12 +87,6 @@ public class TileServer {
         return CompletableFuture.allOf(cfs).thenApply(ignored -> futures.stream()
                 .map(CompletableFuture::join)
                 .toArray(TileImageData[]::new));
-    }
-
-    static {
-        USER_AGENT =
-            System.getProperty("os.name") + " / " + System.getProperty("os.version") + " / " + System.getProperty("os.arch");
-        System.out.println(USER_AGENT);
     }
 
 }
