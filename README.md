@@ -2,6 +2,10 @@
 Terra++ Add-on that generates satellite imagery data to Terra++ world. ~~(In Minecraft, of course)~~<br>
 ⚠️This mod is still in development, so use it with your own peril.
 
+## Known Issues
+ * The mod only works on the client-side; on the server side it just crashes
+ * Minecraft crashes on initialization when the mod is used with [FoamFix](https://www.curseforge.com/minecraft/mc-mods/foamfix-optimization-mod)
+
 ## Usage
  1. Download the mod (TODO: Make a release)
  2. Download [Terra++](https://www.curseforge.com/minecraft/mc-mods/terraplusplus) and its dependencies: [Cubic Chunks](https://www.curseforge.com/minecraft/mc-mods/opencubicchunks) and [CubicWorldGen](https://www.curseforge.com/minecraft/mc-mods/cubicworldgen)

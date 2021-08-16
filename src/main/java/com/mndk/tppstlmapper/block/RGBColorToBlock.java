@@ -222,6 +222,8 @@ public class RGBColorToBlock {
 
 
     private static void add(IBlockState blockState) {
+        // Accessing class Minecraft in the server side throws ClassNotFoundException
+        // TODO: Find another way to access block models
         IBakedModel bakedModel = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(blockState);
         List<BakedQuad> quads = bakedModel.getQuads(blockState, EnumFacing.UP, 0);
         if(quads.size() != 0) {
