@@ -1,9 +1,9 @@
 # TerraSatelliteMapper
-Terra++ Add-on that generates satellite imagery data to Terra++ world. ~~(In Minecraft, of course)~~<br>
+Terra++ Add-on that generates satellite imagery data into Minecraft world.<br>
 ⚠️This mod is still in development, so use it with your own peril.
 
 ## Known Issues
- * The mod only works on the client-side; on the server side it just crashes
+ * The mod crashes on the server-side
  * Minecraft crashes on initialization when the mod is used with [FoamFix](https://www.curseforge.com/minecraft/mc-mods/foamfix-optimization-mod)
 
 ## Usage
