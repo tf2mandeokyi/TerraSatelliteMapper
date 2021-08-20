@@ -2,6 +2,7 @@ package com.mndk.tppstlmapper.block;
 
 import com.mndk.tppstlmapper.TerraSatelliteMapperMod;
 import com.mndk.tppstlmapper.util.CIELabColor;
+import com.mndk.tppstlmapper.util.JarResourceManager;
 import com.mndk.tppstlmapper.util.RGBColorDouble;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
@@ -12,9 +13,20 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.*;
 
 public class RGBColorToBlock {
@@ -23,28 +35,18 @@ public class RGBColorToBlock {
     private static final Map<CIELabColor, Map.Entry<IBlockState, BufferedImage>> blockColorMappings = new HashMap<>();
 
 
-    public static void printAllStates() {
-        for (Block block : Block.REGISTRY) {
-            TerraSatelliteMapperMod.logger.info(block.getRegistryName());
-            IBlockState defaultState = block.getDefaultState();
-            if(defaultState.isBlockNormalCube()) {
-                Collection<IProperty<?>> properties = defaultState.getPropertyKeys();
-                for (IProperty<?> property : properties) {
-                    TerraSatelliteMapperMod.logger.info(
-                            " ㅏ " + property.getName() + " (" + property.getClass().getName() + "=" + property.getValueClass().getName() + "): [");
-                    for(Object value : property.getAllowedValues()) {
-                        TerraSatelliteMapperMod.logger.info(" ㅣ       " + value);
-                    }
-                    TerraSatelliteMapperMod.logger.info(" ㅣ ]");
-                }
-            }
+    public static void init(FMLInitializationEvent event) {
+        try {
+            loadBlockModelsFromResources();
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 
 
-    public static void init(FMLInitializationEvent event) {
+    @SideOnly(Side.CLIENT)
+    public static void initForClient(FMLInitializationEvent event) {
         registerBlockProperties(Blocks.STONE, BlockStone.VARIANT);
-        // registerBlock(Blocks.GRASS, BlockGrass.SNOWY, false);
         registerBlockProperties(Blocks.DIRT, BlockDirt.VARIANT);
         registerBlock(Blocks.COBBLESTONE);
         registerBlockProperties(Blocks.PLANKS, BlockPlanks.VARIANT);
@@ -55,8 +57,6 @@ public class RGBColorToBlock {
         registerBlock(Blocks.IRON_ORE);
         registerBlock(Blocks.COAL_ORE);
         registerBlockProperties(Blocks.LOG, BlockLog.AXIS, BlockPlanks.VARIANT);
-        // registerBlockProperties(Blocks.LEAVES, BlockLeaves.CHECK_DECAY, false, BlockLeaves.DECAYABLE,
-        //         false, BlockPlanks.VARIANT);
         registerBlock(Blocks.LAPIS_ORE);
         registerBlock(Blocks.LAPIS_BLOCK);
         registerBlockProperties(Blocks.DISPENSER, BlockDispenser.TRIGGERED, false, BlockDispenser.FACING);
@@ -85,18 +85,12 @@ public class RGBColorToBlock {
         registerBlock(Blocks.MELON_BLOCK);
         registerBlock(Blocks.MYCELIUM, BlockMycelium.SNOWY, false);
         registerBlock(Blocks.NETHER_BRICK);
-        // registerBlock(Blocks.NETHER_WART);
-        // registerBlock(Blocks.ENCHANTING_TABLE);
         registerBlock(Blocks.EMERALD_ORE);
         registerBlock(Blocks.EMERALD_BLOCK);
-        // registerBlock(Blocks.COMMAND_BLOCK, BlockCommandBlock.CONDITIONAL, false, BlockCommandBlock.FACING,
-        //         EnumFacing.UP);
-        // registerBlock(Blocks.BEACON);
         registerBlock(Blocks.REDSTONE_BLOCK);
         registerBlock(Blocks.QUARTZ_ORE);
         registerBlockProperties(Blocks.QUARTZ_BLOCK, BlockQuartz.VARIANT);
         registerBlockProperties(Blocks.STAINED_HARDENED_CLAY, BlockStainedHardenedClay.COLOR);
-        // registerBlock(Blocks.SLIME_BLOCK);
         registerBlockProperties(Blocks.PRISMARINE, BlockPrismarine.VARIANT);
         registerBlock(Blocks.SEA_LANTERN);
         registerBlockProperties(Blocks.HAY_BLOCK, BlockHay.AXIS);
@@ -106,31 +100,10 @@ public class RGBColorToBlock {
         registerBlockProperties(Blocks.RED_SANDSTONE, BlockRedSandstone.TYPE);
         registerBlockProperties(Blocks.PURPUR_PILLAR, BlockRotatedPillar.AXIS);
         registerBlock(Blocks.END_BRICKS);
-        // registerBlock(Blocks.GRASS_PATH);
-        // registerBlock(Blocks.REPEATING_COMMAND_BLOCK, BlockCommandBlock.CONDITIONAL, false, BlockCommandBlock.FACING,
-        //         EnumFacing.UP);
-        // registerBlock(Blocks.CHAIN_COMMAND_BLOCK, BlockCommandBlock.CONDITIONAL, false, BlockCommandBlock.FACING,
-        //         EnumFacing.UP);
         registerBlock(Blocks.MAGMA);
         registerBlock(Blocks.NETHER_WART_BLOCK);
         registerBlock(Blocks.RED_NETHER_BRICK);
         registerBlockProperties(Blocks.BONE_BLOCK, BlockBone.AXIS);
-        registerBlock(Blocks.WHITE_SHULKER_BOX);
-        registerBlock(Blocks.ORANGE_SHULKER_BOX);
-        registerBlock(Blocks.MAGENTA_SHULKER_BOX);
-        registerBlock(Blocks.LIGHT_BLUE_SHULKER_BOX);
-        registerBlock(Blocks.YELLOW_SHULKER_BOX);
-        registerBlock(Blocks.LIME_SHULKER_BOX);
-        registerBlock(Blocks.PINK_SHULKER_BOX);
-        registerBlock(Blocks.GRAY_SHULKER_BOX);
-        registerBlock(Blocks.SILVER_SHULKER_BOX);
-        registerBlock(Blocks.CYAN_SHULKER_BOX);
-        registerBlock(Blocks.PURPLE_SHULKER_BOX);
-        registerBlock(Blocks.BLUE_SHULKER_BOX);
-        registerBlock(Blocks.BROWN_SHULKER_BOX);
-        registerBlock(Blocks.GREEN_SHULKER_BOX);
-        registerBlock(Blocks.RED_SHULKER_BOX);
-        registerBlock(Blocks.BLACK_SHULKER_BOX);
         registerBlock(Blocks.WHITE_GLAZED_TERRACOTTA, BlockGlazedTerracotta.FACING, EnumFacing.NORTH);
         registerBlock(Blocks.ORANGE_GLAZED_TERRACOTTA, BlockGlazedTerracotta.FACING, EnumFacing.NORTH);
         registerBlock(Blocks.MAGENTA_GLAZED_TERRACOTTA, BlockGlazedTerracotta.FACING, EnumFacing.NORTH);
@@ -149,10 +122,34 @@ public class RGBColorToBlock {
         registerBlock(Blocks.BLACK_GLAZED_TERRACOTTA, BlockGlazedTerracotta.FACING, EnumFacing.NORTH);
         registerBlockProperties(Blocks.CONCRETE, BlockColored.COLOR);
         registerBlockProperties(Blocks.CONCRETE_POWDER, BlockColored.COLOR);
-
+        try {
+            saveBlockModelsWithClient();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
+    @SideOnly(Side.CLIENT)
+    private static void saveBlockModelsWithClient() throws IOException {
+        for(Map.Entry<CIELabColor, Map.Entry<IBlockState, BufferedImage>> entry : blockColorMappings.entrySet()) {
+            IBlockState blockState = entry.getValue().getKey();
+            BufferedImage image = entry.getValue().getValue();
+            ResourceLocation registryName = blockState.getBlock().getRegistryName();
+            if(registryName != null) {
+                File file = new File("D:\\minecraft_block_textures_for_tppstlmapper\\" +
+                        URLEncoder.encode(blockState.getBlock().getRegistryName().toString(), "UTF-8") +
+                        blockState.getPropertyKeys().stream()
+                                .map(property -> "[" + property.getName() + "=" + blockState.getValue(property) + "]")
+                                .reduce("", String::concat) +
+                        ".png");
+                ImageIO.write(image, "png", file);
+            }
+        }
+    }
+
+
+    @SideOnly(Side.CLIENT)
     private static <T extends Comparable<T>> void registerBlockProperties(Block block, IProperty<T> property) {
         IBlockState defaultState = block.getDefaultState();
         for(T value : property.getAllowedValues()) {
@@ -163,6 +160,7 @@ public class RGBColorToBlock {
     }
 
 
+    @SideOnly(Side.CLIENT)
     private static <T extends Comparable<T>, U extends Comparable<U>> void registerBlockProperties(
             Block block, IProperty<T> property1, IProperty<U> property2) {
 
@@ -177,6 +175,7 @@ public class RGBColorToBlock {
     }
 
 
+    @SideOnly(Side.CLIENT)
     private static <T extends Comparable<T>, U extends Comparable<U>>
     void registerBlockProperties(Block block, IProperty<T> property1, T value1, IProperty<U> property2) {
 
@@ -189,6 +188,7 @@ public class RGBColorToBlock {
     }
 
 
+    @SideOnly(Side.CLIENT)
     private static <T extends Comparable<T>, U extends Comparable<U>, V extends Comparable<V>>
     void registerBlockProperties(Block block, IProperty<T> property1, T value1, IProperty<U> property2,
                                  U value2, IProperty<V> property3) {
@@ -202,17 +202,20 @@ public class RGBColorToBlock {
     }
 
 
+    @SideOnly(Side.CLIENT)
     private static void registerBlock(Block block) {
         add(block.getDefaultState());
     }
 
 
+    @SideOnly(Side.CLIENT)
     private static <T extends Comparable<T>> void registerBlock(Block block, IProperty<T> property, T value) {
         IBlockState defaultState = block.getDefaultState();
         add(defaultState.withProperty(property, value));
     }
 
 
+    @SideOnly(Side.CLIENT)
     private static <T extends Comparable<T>, U extends Comparable<U>> void registerBlock(
             Block block, IProperty<T> property1, T value1, IProperty<U> property2, U value2) {
 
@@ -221,6 +224,7 @@ public class RGBColorToBlock {
     }
 
 
+    @SideOnly(Side.CLIENT)
     private static void add(IBlockState blockState) {
         // Accessing class Minecraft in the server side throws ClassNotFoundException
         // TODO: Find another way to access block models
@@ -237,11 +241,15 @@ public class RGBColorToBlock {
     }
 
 
+    /**
+     * Adds block image entry to blockColorMappings
+     */
     private static void add(RGBColorDouble color, IBlockState block, BufferedImage image) {
         blockColorMappings.put(new CIELabColor(color), new AbstractMap.SimpleEntry<>(block, image));
     }
 
 
+    @SideOnly(Side.CLIENT)
     private static BufferedImage[] extractImagesFromTextureSprite(TextureAtlasSprite sprite) {
         int[][] rawTextureData = sprite.getFrameTextureData(0);
         BufferedImage[] result = new BufferedImage[rawTextureData.length];
@@ -258,6 +266,62 @@ public class RGBColorToBlock {
             result[i] = image;
         }
         return result;
+    }
+
+
+    private static void loadBlockModelsFromResources() throws IOException, URISyntaxException {
+        final String path = "assets/tppstlmapper/textures/block/";
+        String[] resourcePathList = JarResourceManager.getResourceListing(RGBColorToBlock.class, path);
+        for(String resourcePath : resourcePathList) {
+            if("".equals(resourcePath)) continue;
+            IBlockState blockState = getBlockStateFromResourcePath(path + resourcePath);
+            InputStream stream = RGBColorToBlock.class.getClassLoader().getResourceAsStream(path + resourcePath);
+            BufferedImage image = ImageIO.read(Objects.requireNonNull(stream));
+            RGBColorDouble color = getAverageColorOfAnImage(image);
+            add(color, Objects.requireNonNull(blockState), image);
+        }
+        TerraSatelliteMapperMod.logger.info("Found " + blockColorMappings.size() + " block textures");
+    }
+
+
+    /**
+     * Should be only called on initialization
+     */
+    private static IBlockState getBlockStateFromResourcePath(String path) throws UnsupportedEncodingException {
+        path = URLDecoder.decode(path, "UTF-8"); // URL decode
+        if("".equals(path)) return null; // null if nothing
+        // path now should be like : assets/tppstlmapper/textures/block/minecraft:<block_name>[p1=v1]...[pn=vn].png
+
+        path = path.substring(0, path.length() - 4); // Cutting ".png" out
+        String[] args = path.split("\\[");
+        String[] folders = args[0].split("/");
+        args[0] = folders[folders.length - 1];
+        // args = ["minecraft:<block_name>", "p1=v1]", "p2=v2]", ... , "pn=vn]"]
+
+        IBlockState blockState = Block.REGISTRY.getObject(new ResourceLocation(args[0])).getDefaultState();
+        Collection<IProperty<?>> propertyKeys = blockState.getPropertyKeys();
+        for(int i = 1; i < args.length; ++i) {
+            args[i] = args[i].substring(0, args[i].length() - 1);
+            // args[i] = "p1=v1"
+            String[] keyValue = args[i].split("=");
+            Optional<IProperty<?>> property = propertyKeys.stream().filter(p -> keyValue[0].equals(p.getName()))
+                    .findFirst();
+            if(!property.isPresent()) continue;
+            blockState = a(blockState, property.get(), keyValue[1]);
+        }
+        return blockState;
+    }
+
+
+    private static <T extends Comparable<T>> IBlockState a(IBlockState blockState, IProperty<T> property, String value) {
+        com.google.common.base.Optional<T> optional = property.parseValue(value);
+        if(!optional.isPresent()) return blockState;
+        return blockState.withProperty(property, optional.get());
+    }
+
+
+    private static <T extends Comparable<T>> IBlockState a(IBlockState original, IProperty<T> property, T value) {
+        return original.withProperty(property, value);
     }
 
 
