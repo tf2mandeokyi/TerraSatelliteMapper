@@ -36,7 +36,7 @@ public class SatelliteImageryBaker implements IEarthDataBaker<int[]> {
                 for(TileImageData tile : tiles) {
                     for (int x = 0; x < 16; ++x) {
                         for (int z = 0; z < 16; ++z) {
-                            double[] geoCoordinates = datasets.projection().toGeo((pos.x << 4) + x, (pos.z << 4) + z);
+                            double[] geoCoordinates = datasets.projection().toGeo((pos.x << 4) + x + .5, (pos.z << 4) + z + .5);
                             RGBColorDouble color = tile.getRGBByGeoCoordinate(geoCoordinates[0], geoCoordinates[1]);
                             if(color != null) {
                                 result[x * 16 + z] = color.toRGBColor();
