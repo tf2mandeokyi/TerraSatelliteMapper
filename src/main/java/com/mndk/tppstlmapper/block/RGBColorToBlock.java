@@ -20,19 +20,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.*;
 
 public class RGBColorToBlock {
 
 
-    private static final Map<CIELabColor, Map.Entry<IBlockState, BufferedImage>> blockColorMappings = new HashMap<>();
+    private static final Map<CIELabColor, IBlockState> blockColorMappings = new HashMap<>();
 
 
     public static void init(FMLInitializationEvent event) {
@@ -122,30 +120,6 @@ public class RGBColorToBlock {
         registerBlock(Blocks.BLACK_GLAZED_TERRACOTTA, BlockGlazedTerracotta.FACING, EnumFacing.NORTH);
         registerBlockProperties(Blocks.CONCRETE, BlockColored.COLOR);
         registerBlockProperties(Blocks.CONCRETE_POWDER, BlockColored.COLOR);
-        try {
-            saveBlockModelsWithClient();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    @SideOnly(Side.CLIENT)
-    private static void saveBlockModelsWithClient() throws IOException {
-        for(Map.Entry<CIELabColor, Map.Entry<IBlockState, BufferedImage>> entry : blockColorMappings.entrySet()) {
-            IBlockState blockState = entry.getValue().getKey();
-            BufferedImage image = entry.getValue().getValue();
-            ResourceLocation registryName = blockState.getBlock().getRegistryName();
-            if(registryName != null) {
-                File file = new File("D:\\minecraft_block_textures_for_tppstlmapper\\" +
-                        URLEncoder.encode(blockState.getBlock().getRegistryName().toString(), "UTF-8") +
-                        blockState.getPropertyKeys().stream()
-                                .map(property -> "[" + property.getName() + "=" + blockState.getValue(property) + "]")
-                                .reduce("", String::concat) +
-                        ".png");
-                ImageIO.write(image, "png", file);
-            }
-        }
     }
 
 
@@ -233,7 +207,7 @@ public class RGBColorToBlock {
         if(quads.size() != 0) {
             TextureAtlasSprite sprite = quads.get(0).getSprite();
             BufferedImage image = extractImagesFromTextureSprite(sprite)[0];
-            add(getAverageColorOfAnImage(image), blockState, image);
+            add(getAverageColorOfAnImage(image), blockState);
         }
         else {
             TerraSatelliteMapperMod.logger.warn("No BakedQuads found for block " + blockState.getBlock().getRegistryName());
@@ -244,8 +218,8 @@ public class RGBColorToBlock {
     /**
      * Adds block image entry to blockColorMappings
      */
-    private static void add(RGBColorDouble color, IBlockState block, BufferedImage image) {
-        blockColorMappings.put(new CIELabColor(color), new AbstractMap.SimpleEntry<>(block, image));
+    private static void add(RGBColorDouble color, IBlockState block) {
+        blockColorMappings.put(new CIELabColor(color), block);
     }
 
 
@@ -278,7 +252,7 @@ public class RGBColorToBlock {
             InputStream stream = RGBColorToBlock.class.getClassLoader().getResourceAsStream(path + resourcePath);
             BufferedImage image = ImageIO.read(Objects.requireNonNull(stream));
             RGBColorDouble color = getAverageColorOfAnImage(image);
-            add(color, Objects.requireNonNull(blockState), image);
+            add(color, Objects.requireNonNull(blockState));
         }
         TerraSatelliteMapperMod.logger.info("Found " + blockColorMappings.size() + " block textures");
     }
@@ -342,11 +316,11 @@ public class RGBColorToBlock {
     }
 
 
-    public static Map.Entry<IBlockState, BufferedImage> getNearestColor(int rgb) {
+    public static IBlockState getNearestColorBlock(int rgb) {
         CIELabColor color = new CIELabColor(new RGBColorDouble(rgb));
         double d, min = Double.POSITIVE_INFINITY;
-        Map.Entry<IBlockState, BufferedImage> result = null;
-        for(Map.Entry<CIELabColor, Map.Entry<IBlockState, BufferedImage>> entry : blockColorMappings.entrySet()) {
+        IBlockState result = null;
+        for(Map.Entry<CIELabColor, IBlockState> entry : blockColorMappings.entrySet()) {
             d = color.getCIE2000DiffSq(entry.getKey());
             if(d < min) { min = d; result = entry.getValue(); }
         }

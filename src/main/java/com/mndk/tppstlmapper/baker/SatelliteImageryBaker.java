@@ -65,7 +65,7 @@ public class SatelliteImageryBaker implements IEarthDataBaker<int[]> {
                 Material original = blockState == null ? null : blockState.getMaterial();
 
                 if (!leaveOsmElements || (original == null || original.getMaterialMapColor() == MapColor.GRASS)) {
-                    builder.surfaceBlocks()[index] = RGBColorToBlock.getNearestColor(data[index]).getKey();
+                    builder.surfaceBlocks()[index] = RGBColorToBlock.getNearestColorBlock(data[index]);
                 }
             }
         }
