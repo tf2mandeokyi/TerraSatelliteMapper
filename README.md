@@ -1,8 +1,6 @@
 # TerraSatelliteMapper
 Terra++ Add-on that generates satellite imagery data into Minecraft world.<br>
-*This mod will generate images only on newly generated chunks; it won't gonna touch your precious already-generated ones*<br>
-
-⚠️This mod is still in development, so use it with your own peril.
+This mod will generate images only on newly generated chunks. it will never change already-generated ones.<br>
  
 ## Usage
  1. Download the mod from [releases](https://github.com/tf2mandeokyi/TerraSatelliteMapper/releases)
